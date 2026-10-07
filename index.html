@@ -3834,8 +3834,8 @@ $("to-merchant").onclick = () => setRole("merchant");
 const h0 = location.hash.slice(1), tabHash = h0 === "merchant" || h0 === "naver" || !!TITLES[h0] || h0.startsWith("visit=");
 setRole(h0 === "merchant" ? "merchant" : tabHash ? "customer" : store.get(ROLE_KEY, "customer"));
 // 온보딩은 HTML에서 처음부터 보이는 상태 (스크립트가 늦거나 멈춰도 첫 화면은 보임).
-// 앱 탭 주소로 바로 연 경우만 숨김
-if (tabHash) { $("onboard").hidden = true; maybePopup(); } else openOnboard();
+// 탭 주소(#map·#naver 등)로 열어도 항상 온보딩부터. 그 탭은 뒤에 미리 열어 두어 '고객'을 고르면 바로 보임
+openOnboard();
 
 // #naver 는 지도 탭을 네이버 지도로 바로 열기 (claude.ai 버전의 '네이버 지도가 나오는 버전 열기' 버튼이 씀)
 const fromHash = () => {
