@@ -3834,11 +3834,11 @@ $("to-merchant").onclick = () => setRole("merchant");
 const h0 = location.hash.slice(1), tabHash = h0 === "merchant" || h0 === "naver" || !!TITLES[h0] || h0.startsWith("visit=");
 setRole(h0 === "merchant" ? "merchant" : tabHash ? "customer" : store.get(ROLE_KEY, "customer"));
 // 온보딩은 HTML에서 처음부터 보이는 상태 (스크립트가 늦거나 멈춰도 첫 화면은 보임).
-// 탭 주소(#map·#naver 등)로 열어도 항상 온보딩부터. 그 탭은 뒤에 미리 열어 두어 '고객'을 고르면 바로 보임
+// 탭 주소(#map·#naver 등)로 열어도 항상 온보딩부터, '고객'을 고르면 항상 홈화면 (사용자 지정 기본값)
 openOnboard();
 
-// #naver 는 지도 탭을 네이버 지도로 바로 열기 (claude.ai 버전의 '네이버 지도가 나오는 버전 열기' 버튼이 씀)
-const fromHash = () => {
+// 처음 열 때(first=true)는 탭 주소를 따르지 않고 주소에서 지움 → 온보딩 뒤 홈. 앱을 쓰는 중에 주소 끝을 바꾸면(#naver 등) 그 탭으로
+const fromHash = first => {
   const h = location.hash.slice(1);
   if (h === "merchant") return setRole("merchant");
   // 가게 QR을 휴대폰 카메라로 찍어 열린 경우(#visit=가게번호): 고객 홈에서 쿠폰 받기. 새로고침해도 또 받지 않게 주소에서 지움
@@ -3849,10 +3849,11 @@ const fromHash = () => {
     return;
   }
   if (h === "naver" || TITLES[h]) setRole("customer");
+  if (first === true) { if (h) window.history.replaceState(null, "", location.pathname + location.search); return; }
   if (h === "naver") { showView("map"); setMapMode("naver"); }
   else if (TITLES[h] && h !== current) showView(h);
 };
-window.addEventListener("hashchange", fromHash); fromHash();
+window.addEventListener("hashchange", () => fromHash(false)); fromHash(true);
 applyLang();
 (async () => {
   const c = window.claude;
